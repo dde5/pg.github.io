@@ -1,0 +1,113 @@
+.icon-link {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.icon-link i {
+  margin-right: 5px;
+}
+
+html {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  padding: 20px;
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.column1 {
+  width: 39.5%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.column2 {
+  width: 59.5%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.row {
+  width: 99%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+form {
+  display: flex;
+}
+
+select,
+input,
+textarea {
+  width: 99%;
+  /* Adjust width to fit within the columns */
+  margin: 5px;
+}
+
+textarea {
+  height: 500px;
+}
+
+.spower {
+  color: rgb(33, 9, 215);
+}
+
+.role {
+  color: rgb(45, 194, 107);
+}
+
+.need {
+  color: rgb(230, 126, 35);
+}
+
+.task {
+  color: rgb(185, 90, 222);
+}
+
+.detail {
+  color: rgb(231, 13, 173);
+}
+
+.tone {
+  color: rgb(137, 168, 25);
+}
+
+.dont {
+  color: rgb(186, 55, 42);
+}
+
+.format {
+  color: rgb(87, 59, 141);
+}
+
+.country {
+  color: rgb(98, 157, 63);
+}
+
+.example {
+  color: rgb(234, 164, 158);
+}
+
+/*
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+*/

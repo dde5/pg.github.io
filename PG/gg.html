@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Select Options Example</title>
+</head>
+
+<body>
+  <h1>Select Options</h1>
+  <label for="language">Language:</label>
+  <select id="language"></select>
+
+  <script>
+    fetch('Lan.json')
+      .then(response => response.json())
+      .then(data => {
+        data.languages.forEach(language => {
+          document.getElementById('language').innerHTML += `<option value="${language.code}">${language.name}</option>`;
+        });
+      });
+  </script>
+</body>
+
+</html>

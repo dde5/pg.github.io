@@ -1,0 +1,16 @@
+var needs = [
+  { value: "{要幹嘛? Needs}", label: "要幹嘛? Needs" },
+  { value: "Pass the exam", label: "通過考試" },
+  { value: "Assessing the Problems of Disease", label: "評估疾病的問題" },
+  { value: "Analysis of treatment programmes", label: "分析治療方案" },
+  { value: "proceed with litigation", label: "進行訴訟(打官司) proceed with litigation" },
+  { value: "Analyze the judgment", label: "分析裁判書(判決)" },
+  { value: "Learn your major", label: "學習你的專業" },
+  { value: "Understand what you think?", label: "想知道你是如何想的?" },
+  { value: "write poems", label: "寫首詩 write poems" },
+  { value: "tell stories", label: "說故事 tell stories" },
+  { value: "write code", label: "寫代碼 write code" },
+  { value: "teach lessons", label: "教課程 teach lessons" },
+  { value: "chat with users", label: "與用戶聊天 chat with users" },
+  { value: "other", label: "其它 other" },
+];

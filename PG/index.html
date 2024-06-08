@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <title>ChatGPT Prompt Generator</title>
+  <script src="script.js"></script>
+  <!-- select option 在<head>標籤中 -->
+  <script src="spowers.js"></script>
+  <script src="cusprompt.js"></script>
+  <script src="roles.js"></script>
+  <script src="needs.js"></script>
+  <script src="tasks.js"></script>
+  <script src="details.js"></script>
+  <script src="tones.js"></script>
+  <script src="dontOptions.js"></script>
+  <script src="format.js"></script>
+  <script src="country.js"></script>
+  <script src="languages.js"></script>
+  <link rel="stylesheet" type="text/css" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <script>
+    function savePrompt() {
+      var textarea = document.getElementById("prompt");
+      var content = textarea.value;
+      var encodedContent = encodeURIComponent(content);
+
+      var data = {
+        content: encodedContent
+      };
+
+      var jsonData = JSON.stringify(data);
+
+      // 呼叫 cusprompt.js 中的儲存函式
+      cusPrompt.save(jsonData);
+    }
+    var cusPrompt = {
+      save: function (data) {
+        var blob = new Blob([data], {type: 'application/json'});
+        var url = URL.createObjectURL(blob);
+
+        var link = document.createElement('a');
+        link.href = url;
+        link.download = '你設計的Prompt.txt';
+        link.click();
+
+        URL.revokeObjectURL(url);
+      }
+    };
+
+  </script>
+
+</head>
+
+<body>
+  <h1>Prompt Generator</h1>
+  <p>這是一個幫助您建立提示供人工智慧處理的網頁。 您可以為人工智慧選擇或輸入角色、需求、任務和不做項目，提示和範例將自動更新。 您也可以將提示和範例複製到剪貼簿，以供人工智慧使用。.</p>
+  <p>PROMPT 概念: <br>Act as a <span style="color: rgb(45, 194, 107);">{ROLE}</span>, I need a <span
+      class="need">{NEEDS}</span>, you will <span class="task">{TASK}</span>, in the process, you should <span
+      class="detail">{Details}</span>, please <span class="dont">{DO NOT...}</span>, input the final result in a <span
+      class="format">{FORMAT}</span>, here is an example:<span class="example">{Examples}</span></p>
+  <p>範例:<br> 身為<span style="color: rgb(45, 194, 107);">SEO專業作家</span>，我需要<span class="need">一篇優化的博文</span>，你會<span
+      class="task">研究關鍵字並將其自然地融入內容中</span>，在這個過程中，你應該 <span
+      class="detail">專注於可讀性、相關性和適當的關鍵字放置</span>，<span class="dont">請避免關鍵字堆砌或過度</span>。<span
+      class="format">優化，以結構良好的格式輸入最終結果</span>，這裡是標題：「有效 SEO 寫作的十大技巧：提高內容的可見性」。</span></p>
+  <div>
+    <center><span class="dont">
+        Checkbox 是一些功能選項，經實驗可以讓AI更好的作用：</span><br>
+    </center>
+  </div>
+  <div class="row">
+    <!-- 建立五個 checkbox，id 和 value 分別為 COT，leso，Iteration，cutbulls -->
+    <!-- 為每個 checkbox 添加一個 onchange 事件監聽器，調用 handleCheckboxChange 函數 -->
+    <div>
+      <!-- <input type="checkbox" id="COT" name="option" value="Let's think step by step." -->
+      <input type="checkbox" id="COT" name="option" value="Let's work this out in a step by step way to be sure we have the right answer."
+        onchange="handleCheckboxChange(event)" />
+      <label for="COT">COT思維鍊</label>
+    </div>
+    <div>
+      <input type="checkbox" id="TOT" name="option" value="Imagine%20three%20different%20experts%20are%20answering%20this%20question.%20All%20experts%20will%20write%20down%201%20step%20of%20their%20thinking%2C%20then%20share%20it%20with%20the%20group.%0AThen%20all%20experts%20will%20go%20on%20to%20the%20next%20step%2C%20etc.%20%0AIf%20any%20expert%20realises%20they're%20wrong%20at%20any%20point%20then%20they%20leave."
+        onchange="handleCheckboxChange(event)" />
+      <label for="TOT">TOT思維鍊</label>
+    </div>
+    <div>
+      <input type="checkbox" id="StepBack" name="option" value="%E4%BD%A0%E6%98%AF%E4%B8%96%E7%95%8C%E7%9F%A5%E8%AD%98%E7%9A%84%E5%B0%88%E5%AE%B6%EF%BC%8C%E6%93%85%E9%95%B7%E9%81%8B%E7%94%A8%E5%BE%8C%E9%80%80%E6%8F%90%E5%95%8F%E7%AD%96%E7%95%A5%EF%BC%8C%E4%B8%80%E6%AD%A5%E6%AD%A5%E4%BB%94%E7%B4%B0%E6%80%9D%E8%80%83%E4%B8%A6%E5%9B%9E%E7%AD%94%E5%95%8F%E9%A1%8C%E3%80%82%0A%0A%E5%BE%8C%E9%80%80%E6%8F%90%E5%95%8F%E6%98%AF%E4%B8%80%E7%A8%AE%E6%80%9D%E8%80%83%E7%AD%96%E7%95%A5%EF%BC%8C%E6%97%A8%E5%9C%A8%E5%BE%9E%E6%9B%B4%E5%AE%8F%E8%A7%80%E6%88%96%E6%9B%B4%E5%9F%BA%E7%A4%8E%E7%9A%84%E8%A7%92%E5%BA%A6%E5%8E%BB%E7%90%86%E8%A7%A3%E5%92%8C%E5%88%86%E6%9E%90%E4%B8%80%E5%80%8B%E7%89%B9%E5%AE%9A%E7%9A%84%E5%95%8F%E9%A1%8C%E6%88%96%E6%83%85%E5%A2%83%E3%80%82%0A%0A%E9%80%99%E7%A8%AE%E7%AD%96%E7%95%A5%E8%A6%81%E6%B1%82%E6%88%91%E5%80%91%E5%9C%A8%E9%9D%A2%E5%B0%8D%E4%B8%80%E5%80%8B%E5%85%B7%E9%AB%94%E5%95%8F%E9%A1%8C%E6%99%82%EF%BC%8C%E5%85%88%E3%80%8C%E5%BE%8C%E9%80%80%E3%80%8D%E4%B8%80%E6%AD%A5%EF%BC%8C%E5%BE%9E%E4%B8%80%E5%80%8B%E6%9B%B4%E5%BB%A3%E6%B3%9B%E6%88%96%E6%9B%B4%E6%A0%B9%E6%9C%AC%E7%9A%84%E8%A7%92%E5%BA%A6%E5%8E%BB%E6%8F%90%E5%95%8F%E5%92%8C%E6%80%9D%E8%80%83%E3%80%82%E9%80%99%E6%A8%A3%E5%81%9A%E7%9A%84%E7%9B%AE%E7%9A%84%E6%98%AF%E5%B9%AB%E5%8A%A9%E6%88%91%E5%80%91%E6%9B%B4%E6%B7%B1%E5%85%A5%E5%9C%B0%E7%90%86%E8%A7%A3%E5%95%8F%E9%A1%8C%E7%9A%84%E8%83%8C%E6%99%AF%E3%80%81%E5%8E%9F%E5%9B%A0%E6%88%96%E7%9B%B8%E9%97%9C%E7%9A%84%E5%9F%BA%E7%A4%8E%E7%9F%A5%E8%AD%98%EF%BC%8C%E5%BE%9E%E8%80%8C%E6%9B%B4%E5%A5%BD%E5%9C%B0%E5%9B%9E%E7%AD%94%E5%8E%9F%E5%A7%8B%E5%95%8F%E9%A1%8C%E3%80%82%0A%0A%E7%AD%96%E7%95%A5%EF%BC%9A%0A%0A%E2%80%A2%20%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5%E8%AD%98%E5%88%A5%EF%BC%9A%E9%A6%96%E5%85%88%E7%A2%BA%E5%AE%9A%E5%95%8F%E9%A1%8C%E7%9A%84%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5%E3%80%82%E4%BE%8B%E5%A6%82%EF%BC%8C%E5%A6%82%E6%9E%9C%E5%95%8F%E9%A1%8C%E6%B6%89%E5%8F%8A%E5%88%B0%E7%89%A9%E7%90%86%E5%AD%B8%E4%B8%AD%E7%9A%84%E5%8A%9B%EF%BC%8C%E9%82%A3%E9%BA%BC%E5%8F%AF%E8%83%BD%E9%9C%80%E8%A6%81%E5%BE%8C%E9%80%80%E5%88%B0%E5%9F%BA%E7%A4%8E%E7%9A%84%E5%8A%9B%E7%9A%84%E5%AE%9A%E7%BE%A9%E5%92%8C%E5%8E%9F%E7%90%86%E3%80%82%0A%0A%E2%80%A2%20%E5%95%8F%E9%A1%8C%E7%9A%84%E7%AF%84%E5%9C%8D%EF%BC%9A%E5%98%97%E8%A9%A6%E8%AD%98%E5%88%A5%E5%95%8F%E9%A1%8C%E7%9A%84%E7%AF%84%E5%9C%8D%E5%92%8C%E4%B8%8A%E4%B8%8B%E6%96%87%E3%80%82%E9%80%99%E6%9C%89%E5%8A%A9%E6%96%BC%E7%A2%BA%E5%AE%9A%E5%BE%8C%E9%80%80%E7%9A%84%E6%B7%B1%E5%BA%A6%E3%80%82%E6%9C%89%E4%BA%9B%E5%95%8F%E9%A1%8C%E5%8F%AF%E8%83%BD%E5%8F%AA%E9%9C%80%E8%A6%81%E7%A8%8D%E5%BE%AE%E5%BE%8C%E9%80%80%E4%B8%80%E6%AD%A5%EF%BC%8C%E8%80%8C%E5%85%B6%E4%BB%96%E5%95%8F%E9%A1%8C%E5%8F%AF%E8%83%BD%E9%9C%80%E8%A6%81%E6%B7%B1%E5%85%A5%E5%88%B0%E5%9F%BA%E7%A4%8E%E5%8E%9F%E7%90%86%E3%80%82%0A%0A%E2%80%A2%20%E6%AD%B7%E5%8F%B2%E5%92%8C%E8%83%8C%E6%99%AF%EF%BC%9A%E5%B0%8D%E6%96%BC%E4%B8%80%E4%BA%9B%E5%95%8F%E9%A1%8C%EF%BC%8C%E4%BA%86%E8%A7%A3%E5%85%B6%E6%AD%B7%E5%8F%B2%E8%83%8C%E6%99%AF%E5%92%8C%E7%99%BC%E5%B1%95%E5%8F%AF%E8%83%BD%E6%9C%83%E6%9C%89%E5%8A%A9%E6%96%BC%E6%8F%90%E5%87%BA%E6%81%B0%E7%95%B6%E7%9A%84%E5%BE%8C%E9%80%80%E5%95%8F%E9%A1%8C%E3%80%82%0A%0A%E2%80%A2%20%E5%8E%9F%E7%90%86%E5%92%8C%E5%81%87%E8%A8%AD%EF%BC%9A%E6%98%8E%E7%A2%BA%E7%95%B6%E5%89%8D%E5%95%8F%E9%A1%8C%E7%9A%84%E5%9F%BA%E7%A4%8E%E5%8E%9F%E7%90%86%E5%92%8C%E5%81%87%E8%A8%AD%E3%80%82%E9%80%99%E5%8F%AF%E4%BB%A5%E5%B9%AB%E5%8A%A9%E7%A2%BA%E5%AE%9A%E6%87%89%E8%A9%B2%E5%BE%9E%E5%93%AA%E4%BA%9B%E6%96%B9%E9%9D%A2%E5%BE%8C%E9%80%80%E3%80%82%0A%0A%E5%9F%B7%E8%A1%8C%E6%AD%A5%E9%A9%9F%EF%BC%9A%0A%0A%E7%94%A8%E4%B8%AD%E6%96%87%E5%92%8C%E7%94%A8%E6%88%B6%E6%89%93%E6%8B%9B%E5%91%BC%EF%BC%8C%E8%A6%81%E6%B1%82%E7%94%A8%E6%88%B6%E8%BC%B8%E5%85%A5%E4%B8%80%E5%80%8B%E5%95%8F%E9%A1%8C%EF%BC%8C%E6%AF%8F%E7%95%B6%E7%94%A8%E6%88%B6%E8%BC%B8%E5%85%A5%E4%B8%80%E5%80%8B%E5%95%8F%E9%A1%8C%EF%BC%8C%E6%82%A8%E8%A6%81%E6%A0%B9%E6%93%9A%E4%BB%A5%E4%B8%8B%E6%B5%81%E7%A8%8B%E5%9B%9E%E7%AD%94%E5%95%8F%E9%A1%8C%EF%BC%9A%0A%0A%E7%B5%A6%E5%87%BA%E8%87%B3%E5%B0%913%E5%80%8B%E7%AC%A6%E5%90%88%20%3C%E7%AD%96%E7%95%A5%3E%20%E7%9A%84%E5%8F%AF%E9%81%B8%20%3C%E5%BE%8C%E9%80%80%E6%8F%90%E5%95%8F%3E%20%E4%B8%A6%E5%88%86%E5%88%A5%E5%9B%9E%E7%AD%94%E3%80%82%0A%0A%E5%B0%87%E4%B8%8A%E8%BF%B0%E5%9B%9E%E7%AD%94%E4%BD%9C%E7%82%BA%E8%AB%96%E6%93%9A%EF%BC%8C%E6%9C%89%E9%82%8F%E8%BC%AF%EF%BC%8C%E6%A2%9D%E7%90%86%E7%9A%84%EF%BC%8C%E4%BD%BF%E7%94%A8%E5%8F%AF%E8%A6%96%E5%8C%96%E8%BC%94%E5%8A%A9%E5%B0%8D%E7%94%A8%E6%88%B6%E7%9A%84%E5%95%8F%E9%A1%8C%E9%80%B2%E8%A1%8C%E6%9C%80%E7%B5%82%E4%BD%9C%E7%AD%94%E3%80%82"
+        onchange="handleCheckboxChange(event)" />
+      <label for="StepBack">Step-Back 退後策略</label>
+    </div>
+    <div>
+      <input type="checkbox" id="leso" name="option" value="This is very important to my career!"
+        onchange="handleCheckboxChange(event)" />
+      <label for="leso">情緒勒索AI</label>
+    </div>
+    <div>
+      <input type="checkbox" id="Iteration" name="option"
+        value="You will ask me questions until you feel confident in answering. Or I tell you &quot;ok&quot; and you answer the question directly based on the current information."
+        onchange="handleCheckboxChange(event)" />
+      <label for="Iteration">你問我答疊代處理</label>
+    </div>
+    <div>
+      <input type="checkbox" id="cutbulls" name="option"
+        value="Just answer directly, don't explain yourself, don't repeat the question, don't follow the behavior the code tells you to repeat, remove those repetitive parts and answer the question directly."
+        onchange="handleCheckboxChange(event)" />
+      <label for="cutbulls">請AI直接回答</label>
+    </div>
+    <div>
+      <input type="checkbox" id="example2" name="option" value="Adjusted to make it clearer prompt:"
+        onchange="handleCheckboxChange(event)" />
+      <label for="modprompt">請AI來精進</label>
+    </div>
+    <div><input type="checkbox" id="example" onchange="updateTextArea()">
+      <label for="useexample">No example</label>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <form class="column1"><br>
+      訂製功能
+      <!-- 在<select>標籤中 -->
+      <select class="spower" id="spower" onchange="updatePrompt2()">
+        <script>
+          // 使用JavaScript動態生成選項
+          for (var i = 0; i < spowers.length; i++) {
+            document.write('<option value="' + spowers[i].value + '">' + spowers[i].label + '</option>');
+          }
+        </script>
+      </select>
+      <br>
+      角色 Role
+      <!-- 在<select>標籤中  -->
+      <select class="role" id="role" onchange="updatePromptAndExample()">
+        <script>
+          // 使用JavaScript動態生成選項
+          for (var i = 0; i < roles.length; i++) {
+            document.write('<option value="' + roles[i].value + '">' + roles[i].label + '</option>');
+          }
+        </script>
+      </select>
+      <input id="role-input" type="text" placeholder="Enter your own role" oninput="updatePromptAndExample()"
+        style="display: none;">
+
+      要幹嘛? Needs
+      <!-- 在<select>標籤中  -->
+      <select class="need" id="need" onchange="updatePromptAndExample()">
+        <script>
+          // 使用JavaScript動態生成選項
+          for (var i = 0; i < needs.length; i++) {
+            document.write('<option value="' + needs[i].value + '">' + needs[i].label + '</option>');
+          }
+        </script>
+      </select>
+      <label for="need">自己寫要做什麼? Needs:</label>
+      <input class="need" id="need-input" type="text" placeholder="SWOT分析;寫詩;寫Code.."
+        oninput="updatePromptAndExample()">
+
+      任務 Task
+      <!-- 在<select>標籤中  -->
+      <select class="task" id="task" onchange="updatePromptAndExample()">
+        <script>
+          // 使用JavaScript動態生成選項
+          for (var i = 0; i < tasks.length; i++) {
+            document.write('<option value="' + tasks[i].value + '">' + tasks[i].label + '</option>');
+          }
+        </script>
+      </select>
+
+      <input id="task-input" type="text" placeholder="Enter your own task" oninput="updatePromptAndExample()"
+        style="display: none;">
+
+      執行細節 Details
+      <!-- 在<select>標籤中  -->
+      <select class="detail" id="detail" placeholder="執行細節 detail" onchange="updatePromptAndExample()">
+        <script>
+          // 使用JavaScript動態生成選項
+          for (var i = 0; i < details.length; i++) {
+            document.write('<option value="' + details[i].value + '">' + details[i].label + '</option>');
+          }
+        </script>
+      </select>
+
+
+      <label for="detail">加入自己的 details 執行細節:</label>
+      <input class="detail" id="detail-input" type="text" placeholder="產生怎樣的報告、細節等" oninput="updatePromptAndExample()">
+      <label for="example1">加入範例或標題</label>
+      <input class="example" id="example1" type="text" placeholder="寫範例或標題給AI參考" oninput="updatePromptAndExample()">
+      <br>
+      回應語調 Tones
+      <!-- 在<select>標籤中 -->
+      <select class="tone" id="tone" onchange="updatePromptAndExample()">
+        <script>
+          // 使用JavaScript動態生成選項
+          for (var i = 0; i < tones.length; i++) {
+            document.write('<option value="' + tones[i].value + '">' + tones[i].label + '</option>');
+          }
+        </script>
+      </select>
+
+      避免 Don't do
+      <!-- 在<select>標籤中  -->
+      <select class="dont" id="dont" onchange="updatePromptAndExample()">
+        <script>
+          // 使用JavaScript動態生成選項
+          for (var i = 0; i < dontOptions.length; i++) {
+            document.write('<option value="' + dontOptions[i].value + '">' + dontOptions[i].label + '</option>');
+          }
+        </script>
+      </select>
+      <input id="dont-input" type="text" placeholder="Enter your own don't do" oninput="updatePromptAndExample()"
+        style="display: none;">
+
+      格式 Format
+      <!-- 在<select>標籤中  -->
+      <select class="format" id="format" onchange="updatePromptAndExample()">
+        <script>
+          // 使用JavaScript動態生成選項
+          for (var i = 0; i < formats.length; i++) {
+            document.write('<option value="' + formats[i].value + '">' + formats[i].label + '</option>');
+          }
+        </script>
+      </select>
+      <input id="format-input" type="text" placeholder="Enter your own format" oninput="updatePromptAndExample()"
+        style="display: none;">
+
+      從不同 [人/地區] 角度回答
+      <!-- 在<select>標籤中  -->
+      <select class="country" id="country" onchange="updatePromptAndExample()">
+        <script>
+          // 使用JavaScript動態生成選項
+          for (var i = 0; i < countries.length; i++) {
+            document.write('<option value="' + countries[i].value + '">' + countries[i].label + '</option>');
+          }
+        </script>
+      </select>
+      <input id="country-input" type="text" placeholder="Enter your own country" oninput="updatePromptAndExample()"
+        style="display: none;">
+
+      回應語言 Reply Language
+      <!-- 在<select>標籤中 -->
+      <select class="reply" id="reply" onchange="updatePromptAndExample()">
+        <script>
+          // 使用JavaScript動態生成選項
+          for (var i = 0; i < languages.length; i++) {
+            document.write('<option value="' + languages[i].value + '">' + languages[i].label + '</option>');
+          }
+        </script>
+      </select>
+      <input id="language-input" type="text" placeholder="Enter your own language" oninput="updatePromptAndExample()"
+        style="display: none;">
+      <br>
+
+    </form>
+
+    <div contenteditable="true" class="column2">
+      <h3>Prompt</h3>
+      <textarea wrap="soft" contenteditable="true" id="prompt"></textarea>
+      <button onclick="copyToClipboard('prompt')">Copy</button><BR><button onclick="savePrompt()">Save</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="column1">
+      <br>
+      <div class="icon-link">
+        <i class="fab fa-python"></i>
+        <a href="https://chat.openai.com/" target="_blank">OpenAI ChatGPT</a>
+      </div>
+      <div class="icon-link">
+        <i class="fab fa-microsoft"></i>
+        <a href="https://www.bing.com/search?q=Bing+AI&showconv=1&FORM=hpcodx" target="_blank">MicroSoft Bing AI</a>
+      </div>
+      <div class="icon-link">
+        <i class="fab fa-microsoft"></i>
+        <a href="https://copilot.microsoft.com/" target="_blank">MicroSoft Copilot(桌機)</a>
+      </div>
+      <div class="icon-link">
+        <i class="fab fa-google"></i>
+        <a href="https://bard.google.com/" target="_blank">Google Bard</a>
+      </div>
+      <div class="icon-link">
+        <i class="fas fa-quora"></i>
+        <a href="https://poe.com/Claude-instant-100k" target="_blank">POE.com</a>
+      </div>
+      <div class="icon-link">
+        <i class="fab fa-Perplexity"></i>
+        <a href="https://www.perplexity.ai" target="_blank">Perplexity AI</a>
+      </div>
+      <div class="icon-link">
+        <i class="fab fa-Salesforce"></i>
+        <a href="https://you.com/search?q=who+are+you&tbm=youchat&cfr=chat">You Chat</a>
+      </div>
+
+      <div class="icon-link">
+        <i class="fab fa-opengpt"></i>
+        <a href="https://opengpts-example-vz4y4ooboq-uc.a.run.app/">Open GPT 開源GPT</a>
+      </div>
+
+      <div class="icon-link">
+        <i class="fas fa-quora"></i>
+        <a href="https://poe.com/PromptGenius" target="_blank">加強 Prompt-PromptGenius</a>
+      </div>
+
+      <div class="icon-link">
+        <i class="fas fa-quora"></i>
+        <a href="https://poe.com/ChatGPTPrompty" target="_blank">加強 Prompt-Prompty</a>
+      </div>
+      <div class="icon-link">
+        <i class="fas fa-quora"></i>
+        <a href="https://poe.com/BotiScan" target="_blank">BotiScan-產生疾病報告</a>
+      </div>
+      <div class="icon-link">
+        <i class="fas fa-quora"></i>
+        <a href="https://poe.com/DrSally" target="_blank">DrSally-問最佳治療方案</a>
+      </div>
+      <div class="icon-link">
+        <i class="fas fa-quora"></i>
+        <a href="https://poe.com/Medcal-X" target="_blank">Medcal-X-問衛教、治療方向</a>
+      </div>
+      <div class="icon-link">
+        <i class="fas fa-quora"></i>
+        <a href="https://poe.com/MedBot3" target="_blank">MedBot3-問衛教、治療方向</a>
+      </div>
+
+    </div>
+    <div class="column2"><br>
+<!--       <p>#幫助 Prompt 優化所使用的 example (若有更好的可替換在下面)</p>
+      <textarea contenteditable="true" class="example" name="example1" id="example1" cols="30" rows="10"
+        placeholder="寫下給AI的參考可以讓你不完美的 Prompt 變得更完美!"
+        oninput="updatePromptAndExample">Act as an SEO professional writer, I need an optimized blog post, you will research keywords and incorporate them naturally into the content, in the process, you should focus on readability, relevance, and proper keyword placement, please avoid keyword stuffing or over-optimization, input the final result in a well-struetured format, here is an the title:"Top 10 Tips for Effective SEO Writing: Boost Your Content's Visibility".</textarea> -->
+        <div class="icon-link">
+          <i class="fab fa-prompt"></i>
+          <a href="https://www.explainthis.io/zh-hant/chatgpt" target="_blank">ChatGPT 指令大全(中文)</a>
+        </div>
+        <div class="icon-link">
+          <i class="fab fa-prompt"></i>
+          <a href="https://prompts.chat/#chatgpt-seo-prompts" target="_blank">Awesome ChatGPT Prompts</a>
+        </div>
+        <div class="icon-link">
+          <i class="fab fa-datafit"></i>
+          <a href="https://datafit.ai/?filter=latest&ref=chat.openai.com" target="_blank">DataFit-ChatGPT Prompts Community</a>
+        </div>
+        <div class="icon-link">
+          <i class="fab fa-prompt"></i>
+          <a href="https://contentatscale.ai/ai-prompt-library/" target="_blank">Content at Scale</a>
+        </div>
+        <div class="icon-link">
+          <i class="fab fa-microsoft"></i>
+          <a href="https://www.microsoft.com/en-us/edge/copilot?ep=0&es=36&form=MT00JF&OCID=MT00JF" target="_blank">MS Content Builder</a>
+        </div>
+        <div class="icon-link">
+          <i class="fab fa-github"></i>
+          <a href="https://github.com/LouisShark/chatgpt_system_prompt" target="_blank">GitHub-GPTs洩漏的Prompt
+          </a>
+        </div>
+        <div class="icon-link">
+          <i class="fab fa-google"></i>
+          <a href="https://translate.google.com/" target="_blank">Google翻譯</a>
+        </div>
+        <div class="icon-link">
+          <i class="fab fa-deepl"></i>
+          <a href="https://www.deepl.com/translator#tw/en/" target="_blank">DeepL翻譯</a>
+        </div>
+        <div class="icon-link">
+          <i class="fab fa-Translator"></i>
+          <a href="./Tcode.html">URL轉碼/解碼</a>
+        </div>
+        <div class="icon-link">
+          <i class="fab fa-proton"></i>
+          <a href="https://account.proton.me/login" target="_blank">Proton Mail</a>
+        </div>
+        <div class="icon-link">
+          <a href="https://dde5.github.io/hrbooks.github.io/hrbooks/" target="_blank">Hyread TW 45館搜尋</a>
+        </div>
+        <div class="icon-link">
+          <a href="https://colab.research.google.com/drive/1mK5K1HohhkYLoaf9WtTsY40BlVWBjvbd" target="_blank">Colab-Hyread 45館搜尋</a>
+        </div>
+  
+  
+        <div class="icon-link">
+          <i class="fab fa-lishiyouxiang"></i>
+          <a href="https://www.linshiyouxiang.net">临时邮箱 - 十秒钟内收到邮件</a>
+        </div>
+        <br><br><br><br><br><br><br><br><br><br>
+        <p>© 2023 Ipa. All rights reserved.</p>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+</body>
+
+</html>

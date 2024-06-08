@@ -1,0 +1,229 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        #left, #right {
+            width: 50%;
+            height: 100%;
+            float: left;
+        }
+        #html-input, #result {
+            width: 90%;
+            height: 80%;
+        }
+        #file-name, #analyze-button, #tag-select, #attr-select, #value-select {
+            width: 90%;
+        }
+    </style>
+</head>
+<body>
+    <div id="left">
+        <textarea id="html-input" placeholder="輸入 HTML 原始碼"></textarea>
+        <input id="file-name" type="text" placeholder="輸入檔案名稱，例如 grabug.html">
+        <button id="save-button" onclick="saveFile()">儲存檔案</button>
+        <h5>爬取網址的原始碼</h5>
+        <div id="container">
+          <!-- 這裡是一個 input box 和一個按鈕，用來輸入網址和觸發爬取 -->
+          <input id="url-input" type="text" placeholder="請輸入網址">
+          <button id="fetch-button" onclick="fetchUrl()">爬取網址</button>
+        </div>   
+    </div>
+    <div id="right">
+        <button id="analyze-button" onclick="analyzeHtml()">分析 HTML 內容</button>
+        <select id="tag-select" onchange="filterAttr()">
+            <option value="">選擇標籤</option>
+        </select>
+        <select id="attr-select" onchange="filterValue()">
+            <option value="">選擇屬性</option>
+        </select>
+        <select id="value-select" onchange="showResult()">
+            <option value="">選擇值</option>
+        </select>
+    </ br><br>
+        <label id="result">結果:</label>
+    </div>
+    <script>
+        // 這裡是一些 JavaScript 函數，用來實現爬蟲和測試的功能
+        var encodedText = "%3Chtml%3E%0A%3Chead%3E%0A%20%20%3Ctitle%3E%E7%88%AC%E5%8F%96%E7%AF%84%E4%BE%8B%3C%2Ftitle%3E%0A%3C%2Fhead%3E%0A%3Cbody%3E%0A%20%20%3Ch1%20id%3D%22title%22%3E%E9%80%99%E6%98%AF%E6%A8%99%E9%A1%8C%3C%2Fh1%3E%0A%20%20%3Cp%20class%3D%22content%22%3E%E9%80%99%E6%98%AF%E5%85%A7%E5%AE%B9%3C%2Fp%3E%0A%20%20%3Cul%20id%3D%22list%22%3E%0A%20%20%20%20%3Cli%3E%E9%80%99%E6%98%AF%E5%88%97%E8%A1%A8%E9%A0%85%E7%9B%AE%E4%B8%80%3C%2Fli%3E%0A%20%20%20%20%3Cli%3E%E9%80%99%E6%98%AF%E5%88%97%E8%A1%A8%E9%A0%85%E7%9B%AE%E4%BA%8C%3C%2Fli%3E%0A%20%20%20%20%3Cli%3E%E9%80%99%E6%98%AF%E5%88%97%E8%A1%A8%E9%A0%85%E7%9B%AE%E4%B8%89%3C%2Fli%3E%0A%20%20%3C%2Ful%3E%0A%20%20%3Cscript%3E%0A%20%20%20%20%2F%2F%20%E4%BD%BF%E7%94%A8%20fetch%20%E6%96%B9%E6%B3%95%E7%99%BC%E9%80%81%E8%AB%8B%E6%B1%82%EF%BC%8C%E7%8D%B2%E5%8F%96%E9%9F%BF%E6%87%89%0A%20%20%20%20fetch(%22https%3A%2F%2Fexample.com%2Fdata.json%22)%0A%20%20%20%20%20%20.then(response%20%3D%3E%20response.json())%20%2F%2F%20%E5%B0%87%E9%9F%BF%E6%87%89%E8%BD%89%E6%8F%9B%E7%82%BA%20JSON%20%E6%A0%BC%E5%BC%8F%0A%20%20%20%20%20%20.then(data%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%2F%2F%20%E4%BD%BF%E7%94%A8%20map%20%E6%96%B9%E6%B3%95%E5%B0%8D%E6%95%B8%E6%93%9A%E9%80%B2%E8%A1%8C%E8%99%95%E7%90%86%EF%BC%8C%E8%BF%94%E5%9B%9E%E4%B8%80%E5%80%8B%E6%96%B0%E7%9A%84%E6%95%B8%E7%B5%84%0A%20%20%20%20%20%20%20%20let%20items%20%3D%20data.map(item%20%3D%3E%20%60%3Cli%3E%24%7Bitem.name%7D%3A%20%24%7Bitem.value%7D%3C%2Fli%3E%60)%3B%0A%0A%20%20%20%20%20%20%20%20%2F%2F%20%E4%BD%BF%E7%94%A8%20then%20%E6%96%B9%E6%B3%95%E7%B9%BC%E7%BA%8C%E6%93%8D%E4%BD%9C%E6%95%B8%E6%93%9A%EF%BC%8C%E5%B0%87%E6%95%B8%E7%B5%84%E8%BD%89%E6%8F%9B%E7%82%BA%E5%AD%97%E7%AC%A6%E4%B8%B2%0A%20%20%20%20%20%20%20%20return%20items.join(%22%22)%3B%0A%20%20%20%20%20%20%7D)%0A%20%20%20%20%20%20.then(items%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%2F%2F%20%E7%8D%B2%E5%8F%96%20DOM%20%E4%B8%AD%E7%9A%84%E5%85%83%E7%B4%A0%0A%20%20%20%20%20%20%20%20let%20title%20%3D%20document.getElementById(%22title%22)%3B%0A%20%20%20%20%20%20%20%20let%20content%20%3D%20document.getElementsByClassName(%22content%22)%5B0%5D%3B%0A%20%20%20%20%20%20%20%20let%20list%20%3D%20document.getElementById(%22list%22)%3B%0A%0A%20%20%20%20%20%20%20%20%2F%2F%20%E4%BF%AE%E6%94%B9%E5%85%83%E7%B4%A0%E7%9A%84%E6%A8%99%E7%B1%A4%E3%80%81%E5%B1%AC%E6%80%A7%E3%80%81%E5%80%BC%E7%AD%89%E7%AD%89%0A%20%20%20%20%20%20%20%20title.innerHTML%20%3D%20%22%E9%80%99%E6%98%AF%E6%96%B0%E7%9A%84%E6%A8%99%E9%A1%8C%22%3B%0A%20%20%20%20%20%20%20%20title.setAttribute(%22style%22%2C%20%22color%3A%20red%3B%22)%3B%0A%20%20%20%20%20%20%20%20content.innerHTML%20%3D%20%22%E9%80%99%E6%98%AF%E6%96%B0%E7%9A%84%E5%85%A7%E5%AE%B9%22%3B%0A%20%20%20%20%20%20%20%20content.classList.add(%22highlight%22)%3B%0A%20%20%20%20%20%20%20%20list.innerHTML%20%3D%20items%3B%0A%20%20%20%20%20%20%7D)%0A%20%20%20%20%20%20.catch(error%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%2F%2F%20%E6%8D%95%E7%8D%B2%E9%8C%AF%E8%AA%A4%E4%B8%A6%E8%99%95%E7%90%86%0A%20%20%20%20%20%20%20%20console.log(error)%3B%0A%20%20%20%20%20%20%7D)%3B%0A%20%20%3C%2Fscript%3E%0A%3C%2Fbody%3E%0A%3C%2Fhtml%3E";
+        var decodedText = decodeURIComponent(encodedText);
+        document.getElementById("html-input").value = decodedText;
+
+        // 儲存檔案的函數
+        function saveFile() {
+            // 取得 HTML 內容和檔案名稱
+            var html = $("#html-input").val();
+            var fileName = $("#file-name").val();
+            // 檢查是否有輸入
+            if (html == "" || fileName == "") {
+                alert("請輸入 HTML 內容和檔案名稱");
+                return;
+            }
+            // 建立 blob 物件
+            var blob = new Blob([html], {type: "text/html"});
+            // 建立下載連結
+            var link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            // 觸發下載
+            link.click();
+        }
+
+        // 分析 HTML 內容的函數
+        function analyzeHtml() {
+            // 取得 HTML 內容
+            var html = $("#html-input").val();
+            // 檢查是否有輸入
+            if (html == "") {
+                alert("請輸入 HTML 內容");
+                return;
+            }
+            // 建立一個暫時的 div 元素，並將 HTML 內容放入
+            var tempDiv = document.createElement("div");
+            tempDiv.innerHTML = html;
+            // 取得所有的元素
+            var elements = tempDiv.getElementsByTagName("*");
+            // 建立一個物件，用來儲存標籤、屬性和值的資訊
+            var info = {};
+            // 遍歷所有的元素
+            for (var i = 0; i < elements.length; i++) {
+                // 取得元素的標籤名稱
+                var tag = elements[i].tagName.toLowerCase();
+                // 如果標籤名稱不存在於物件中，則新增一個空物件
+                if (!info[tag]) {
+                    info[tag] = {};
+                }
+                // 取得元素的所有屬性
+                var attrs = elements[i].attributes;
+                // 遍歷所有的屬性
+                for (var j = 0; j < attrs.length; j++) {
+                    // 取得屬性名稱和值
+                    var attr = attrs[j].name.toLowerCase();
+                    var value = attrs[j].value;
+                    // 如果屬性名稱不存在於物件中，則新增一個空陣列
+                    if (!info[tag][attr]) {
+                        info[tag][attr] = [];
+                    }
+                    // 如果值不存在於陣列中，則新增之
+                    if (!info[tag][attr].includes(value)) {
+                        info[tag][attr].push(value);
+                    }
+                }
+            }
+            // 清空下拉選單的選項
+            $("#tag-select").empty();
+            $("#attr-select").empty();
+            $("#value-select").empty();
+            // 新增預設的選項
+            $("#tag-select").append("<option value=''>選擇標籤</option>");
+            $("#attr-select").append("<option value=''>選擇屬性</option>");
+            $("#value-select").append("<option value=''>選擇值</option>");
+            // 將物件轉換為 JSON 字串，並儲存在下拉選單的 data 屬性中
+            $("#tag-select").data("info", JSON.stringify(info));
+            // 遍歷物件的鍵值，並新增到標籤的下拉選單中
+            for (var key in info) {
+                $("#tag-select").append("<option value='" + key + "'>" + key + "</option>");
+            }
+            // 清空結果 Label 的內容
+            $("#result").text("結果");
+        }
+
+        // 篩選屬性的函數
+        function filterAttr() {
+            // 取得選擇的標籤
+            var tag = $("#tag-select").val();
+            // 清空屬性和值的下拉選單的選項
+            $("#attr-select").empty();
+            $("#value-select").empty();
+            // 新增預設的選項
+            $("#attr-select").append("<option value=''>選擇屬性</option>");
+            $("#value-select").append("<option value=''>選擇值</option>");
+            // 如果沒有選擇標籤，則結束函數
+            if (tag == "") {
+                return;
+            }
+            // 取得儲存在標籤下拉選單的 data 屬性中的 JSON 字串，並轉換為物件
+            var info = JSON.parse($("#tag-select").data("info"));
+            // 遍歷物件中對應標籤的鍵值，並新增到屬性的下拉選單中
+            for (var key in info[tag]) {
+                $("#attr-select").append("<option value='" + key + "'>" + key + "</option>");
+            }
+            // 清空結果 Label 的內容
+            $("#result").text("結果");
+        }
+
+        // 篩選值的函數
+        function filterValue() {
+            // 取得選擇的標籤和屬性
+            var tag = $("#tag-select").val();
+            var attr = $("#attr-select").val();
+            // 清空值的下拉選單的選項
+            $("#value-select").empty();
+            // 新增預設的選項
+            $("#value-select").append("<option value=''>選擇值</option>");
+            // 如果沒有選擇標籤或屬性，則結束函數
+            if (tag == "" || attr == "") {
+                return;
+            }
+            // 取得儲存在標籤下拉選單的 data 屬性中的 JSON 字串，並轉換為物件
+            var info = JSON.parse($("#tag-select").data("info"));
+            // 遍歷物件中對應標籤和屬性的陣列，並新增到值的下拉選單中
+            for (var i = 0; i < info[tag][attr].length; i++) {
+                var value = info[tag][attr][i];
+                $("#value-select").append("<option value='" + value + "'>" + value + "</option>");
+            }
+        }
+
+        // 顯示結果的函數
+        function showResult() {
+            // 取得選擇的標籤、屬性和值
+            var tag = $("#tag-select").val();
+            var attr = $("#attr-select").val();
+            var value = $("#value-select").val();
+            // 如果沒有選擇標籤、屬性或值，則結束函數
+            if (tag == "" || attr == "" || value == "") {
+                return;
+            }
+            // 取得 HTML 內容
+            var html = $("#html-input").val();
+            // 建立一個暫時的 div 元素，並將 HTML 內容放入
+            var tempDiv = document.createElement("div");
+            tempDiv.innerHTML = html;
+            // 使用 jQuery 的選擇器，找出符合條件的元素
+            var result = $(tempDiv).find(tag + "[" + attr + "='" + value + "']");
+            // 如果找到了元素，則顯示其內容，否則顯示沒有找到
+            if (result.length > 0) {
+                $("#result").text("結果：" + result.text());
+            } else {
+                $("#result").text("結果：沒有找到符合的元素");
+            }
+        }
+
+        // 這個函數用來爬取 input box 中的網址，並且將原始碼放到 textarea 中
+        function fetchUrl() {
+            // 獲取 input box 中的網址
+            var url = document.getElementById("url-input").value;
+            // 獲取 textarea 元素，用來顯示原始碼
+            var output = document.getElementById("html-input");
+            // 如果 output 不為 null，則清空它的內容
+            if (output) {
+            output.value = "";
+            }
+            
+            // 使用 fetch 來發送一個 HTTP 請求，將網址作為請求的參數
+            fetch(url)
+            // 使用 response.text 來獲取回應的內容，得到一個 promise 物件
+            .then(response => response.text())
+            // 使用 then 來處理 promise 物件，將回應的內容放到 textarea 中
+            .then(data => {
+                output.value = data;
+            })
+            // 使用 catch 來處理可能發生的錯誤，將錯誤訊息放到 textarea 中
+            .catch(error => {
+                output.value = error.message;
+            });
+        }
+    </script>
+</body>
+</html>

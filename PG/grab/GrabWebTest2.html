@@ -1,0 +1,283 @@
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爬蟲範例</title>
+    <script>
+        // 定義一個函數，用於將爬蟲回來的檔案存成指定檔案名稱
+        function saveFile(content, filename) {
+            // 創建一個 blob 物件，用於存儲檔案內容
+            const blob = new Blob([content], {type: "text/html"});
+            // 創建一個 a 標籤，用於下載檔案
+            const a = document.createElement("a");
+            // 設置 a 標籤的屬性
+            a.href = URL.createObjectURL(blob); // 生成一個 blob URL
+            a.download = filename; // 設置檔案名稱
+            a.style.display = "none"; // 隱藏 a 標籤
+            // 將 a 標籤添加到文檔中
+            document.body.appendChild(a);
+            // 觸發 a 標籤的點擊事件，開始下載檔案
+            a.click();
+            // 移除 a 標籤
+            document.body.removeChild(a);
+        }
+
+        // 定義一個函數，用於發送爬蟲請求
+        function sendRequest() {
+            // 獲取 input 元素，用於輸入要抓的網址
+            const input = document.getElementById("input");
+            // 獲取 input 元素的值，即要抓的網址
+            const url = input.value;
+            // 檢查網址是否合法
+            if (!url) {
+                // 如果網址為空，則提示用戶輸入
+                alert("請輸入要抓的網址");
+                return;
+            }
+            if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                // 如果網址不以 http:// 或 https:// 開頭，則提示用戶輸入完整的網址
+                alert("請輸入完整的網址，包括 http:// 或 https://");
+                return;
+            }
+            // 獲取 textarea 元素，用於輸入檔案名稱
+            const textarea = document.getElementById("textarea");
+            // 獲取 textarea 元素的值，即檔案名稱
+            let filename = textarea.value;
+            // 檢查檔案名稱是否合法
+            if (!filename) {
+                // 如果檔案名稱為空，則使用預設的檔案名稱，即 "抓的時間_source.html"
+                // 獲取當前的時間，格式為 yyyy-mm-dd_hh-mm-ss
+                const date = new Date();
+                const year = date.getFullYear();
+                const month = date.getMonth() + 1;
+                const day = date.getDate();
+                const hour = date.getHours();
+                const minute = date.getMinutes();
+                const second = date.getSeconds();
+                const time = year + "-" + month + "-" + day + "_" + hour + "-" + minute + "-" + second;
+                // 獲取網址的來源，即網址中的域名部分
+                const source = url.split("/")[2];
+                // 拼接檔案名稱
+                filename = time + "_" + source + ".html";
+            }
+            // 使用 fetch API 發送爬蟲請求
+            fetch(url)
+                .then(function(response) {
+                    // 檢查響應的狀態碼是否為 200，即成功
+                    if (response.status === 200) {
+                        // 返回響應的文本內容
+                        return response.text();
+                    } else {
+                        // 如果響應的狀態碼不為 200，則拋出錯誤
+                        throw new Error("爬蟲失敗，響應的狀態碼為 " + response.status);
+                    }
+                })
+                .then(function(content) {
+                    // 獲取響應的文本內容，即爬蟲回來的檔案內容
+                    // 調用 saveFile 函數，將爬蟲回來的檔案存成指定檔案名稱
+                    saveFile(content, filename);
+                    // 提示用戶爬蟲成功
+                    alert("爬蟲成功，檔案已保存為 " + filename);
+                })
+                .catch(function(error) {
+                    // 捕獲任何錯誤，並提示用戶
+                    alert("爬蟲失敗，錯誤信息為 " + error.message);
+                });
+        }
+
+        // 定義一個函數，用於測試抓取的內容
+        function testContent() {
+            // 獲取 radio 元素，用於選擇測試的方式
+            const radios = document.getElementsByName("radio");
+            // 定義一個變數，用於存儲選擇的方式
+            let method = "";
+            // 遍歷 radio 元素，找出被選中的那個
+            for (let i = 0; i < radios.length; i++) {
+                if (radios[i].checked) {
+                    // 獲取被選中的 radio 元素的值，即測試的方式
+                    method = radios[i].value;
+                    break;
+                }
+            }
+            // 檢查測試的方式是否合法
+            if (!method) {
+                // 如果測試的方式為空，則提示用戶選擇
+                alert("請選擇測試的方式");
+                return;
+            }
+            // 獲取 input 元素，用於輸入要測試的標籤
+            const input1 = document.getElementById("input1");
+            // 獲取 input 元素的值，即要測試的標籤
+            const tag = input1.value;
+            // 檢查要測試的標籤是否合法
+            if (!tag) {
+                // 如果要測試的標籤為空，則提示用戶輸入
+                alert("請輸入要測試的標籤");
+                return;
+            }
+            // 獲取 input 元素，用於輸入要測試的屬性
+            const input2 = document.getElementById("input2");
+            // 獲取 input 元素的值，即要測試的屬性
+            const attribute = input2.value;
+            // 檢查要測試的屬性是否合法
+            if (!attribute) {
+                // 如果要測試的屬性為空，則提示用戶
+ //第一斷點               
+                // 如果要測試的屬性為空，則提示用戶輸入
+                alert("請輸入要測試的屬性");
+                return;
+            }
+            // 獲取 input 元素，用於輸入要測試的值
+            const input3 = document.getElementById("input3");
+            // 獲取 input 元素的值，即要測試的值
+            const value = input3.value;
+            // 檢查要測試的值是否合法
+            if (!value) {
+                // 如果要測試的值為空，則提示用戶輸入
+                alert("請輸入要測試的值");
+                return;
+            }
+            // 根據測試的方式，執行不同的邏輯
+            switch (method) {
+                case "DOM":
+                    // 如果選擇了 DOM 方式，則使用 document 物件模型來測試
+                    // 獲取文檔中所有符合標籤的元素
+                    const elements = document.getElementsByTagName(tag);
+                    // 定義一個變數，用於存儲測試的結果
+                    let result = "";
+                    // 遍歷所有的元素，檢查它們的屬性和值是否符合
+                    for (let i = 0; i < elements.length; i++) {
+                        // 獲取當前的元素
+                        const element = elements[i];
+                        // 獲取當前元素的屬性值
+                        const attr = element.getAttribute(attribute);
+                        // 檢查屬性值是否存在，並且是否等於要測試的值
+                        if (attr && attr === value) {
+                            // 如果符合，則將當前元素的內容添加到結果中
+                            result += element.innerHTML + "\n";
+                        }
+                    }
+                    // 檢查結果是否為空
+                    if (result) {
+                        // 如果不為空，則提示用戶測試成功，並顯示結果
+                        alert("測試成功，找到了符合條件的元素，它們的內容如下：\n" + result);
+                    } else {
+                        // 如果為空，則提示用戶測試失敗，沒有找到符合條件的元素
+                        alert("測試失敗，沒有找到符合條件的元素");
+                    }
+                    break;
+                case "JavaScript":
+                    // 如果選擇了 JavaScript 方式，則使用 eval 函數來測試
+                    // 定義一個變數，用於存儲測試的代碼
+                    let code = "";
+                    // 拼接測試的代碼，使用 querySelectorAll 函數來選擇符合條件的元素
+                    code += "const elements = document.querySelectorAll('" + tag + "[" + attribute + "=" + value + "]');\n";
+                    // 拼接測試的代碼，使用 for...of 迴圈來遍歷符合條件的元素
+                    code += "let result = '';\n";
+                    code += "for (const element of elements) {\n";
+                    // 拼接測試的代碼，將符合條件的元素的內容添加到結果中
+                    code += "    result += element.innerHTML + '\\n';\n";
+                    code += "}\n";
+                    // 拼接測試的代碼，檢查結果是否為空
+                    code += "if (result) {\n";
+                    // 拼接測試的代碼，如果不為空，則提示用戶測試成功，並顯示結果
+                    code += "    alert('測試成功，找到了符合條件的元素，它們的內容如下：\\n' + result);\n";
+                    code += "} else {\n";
+                    // 拼接測試的代碼，如果為空，則提示用戶測試失敗，沒有找到符合條件的元素
+                    code += "    alert('測試失敗，沒有找到符合條件的元素');\n";
+                    code += "}\n";
+                    // 使用 try...catch 語句來捕獲任何錯誤
+                    try {
+                        // 使用 eval 函數來執行測試的代碼
+                        eval(code);
+                    } catch (error) {
+                        // 如果發生錯誤，則提示用戶測試失敗，並顯示錯誤信息
+                        alert("測試失敗，錯誤信息為 " + error.message);
+                    }
+                    break;
+                case "fetch":
+                    // 如果選擇了 fetch 方式，則使用 fetch API 來測試
+                    // 獲取 input 元素，用於輸入要抓的網址
+                    const input = document.getElementById("input");
+                    // 獲取 input 元素的值，即要抓的網址
+                    const url = input.value;
+                    // 檢查網址是否合法
+                    if (!url) {
+                        // 如果網址為空，則提示用戶輸入
+                        alert("請輸入要抓的網址");
+                        return;
+                    }
+                    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                        // 如果網址不以 http:// 或 https:// 開頭，則提示用戶輸入完整的網址
+                        alert("請輸入完整的網址，包括 http:// 或 https://");
+                        return;
+                    }
+                    // 使用 fetch API 發送爬蟲請求
+                    fetch(url)
+                        .then(function(response) {
+                            // 檢查響應的狀態碼是否為 200，即成功
+                            if (response.status === 200) {
+                                // 返回響應的文本內容
+                                return response.text();
+                            } else {
+                                // 如果響應的狀態碼不為 200，則拋出錯誤
+                                throw new Error("爬蟲失敗，響應的狀態碼為 " + response.status);
+                            }
+                        })
+                        .then(function(content) {
+                            // 獲取響應的文本內容，即爬蟲回來的檔案內容
+                            // 創建一個 DOMParser 物件，用於解析 HTML 字串
+                            const parser = new DOMParser();
+                            // 使用 parseFromString 函數，將 HTML 字串轉換為 HTMLDocument 物件
+                            const doc = parser.parseFromString(content, "text/html");
+                            // 使用 querySelectorAll 函數，從 HTMLDocument 物件中選擇符合條件的元素
+                            const elements = doc.querySelectorAll(tag + "[" + attribute + "=" + value + "]");
+                            // 定義一個變數，用於存儲測試的結果
+                            let result = "";
+                            // 使用 for...of 迴圈來遍歷符合條件的元素
+                            for (const element of elements) {
+                                // 將符合條件的元素的內容添加到結果中
+                                result += element.innerHTML + "\n";
+                            }
+                            // 檢查結果是否為空
+                            if (result) {
+                                // 如果不為空，則提示用戶測試成功，並顯示結果
+                                //alert("測試成功，找到了符
+//第二斷點
+                                // 如果不為空，則提示用戶測試成功，並顯示結果
+                                alert("測試成功，找到了符合條件的元素，它們的內容如下：\n" + result);
+                            } else {
+                                // 如果為空，則提示用戶測試失敗，沒有找到符合條件的元素
+                                alert("測試失敗，沒有找到符合條件的元素");
+                            }
+                        })
+                        .catch(function(error) {
+                            // 捕獲任何錯誤，並提示用戶
+                            alert("爬蟲失敗，錯誤信息為 " + error.message);
+                        });
+                    break;
+                default:
+                    // 如果選擇了其他方式，則提示用戶無效的選擇
+                    alert("無效的測試方式");
+                    break;
+            }
+        } // 這裡是我添加的右大括號，用於結束 testContent 函數的定義
+        </script>
+
+</head>
+
+<body>
+    <h1>爬蟲範例2 (改了更合規的格式)</h1>
+    <p>請在下面的 input 元素中輸入要抓的網址，然後點擊「發送請求」按鈕</p> <input id="input" type="text" placeholder="請輸入要抓的網址"> <button
+        onclick="sendRequest()">發送請求</button>
+    <p>請在下面的 textarea 元素中輸入檔案名稱，如果沒有輸入，則使用預設的檔案名稱，即 "抓的時間_source.html"</p> <textarea id="textarea" rows="4" cols="50"
+        placeholder="請輸入檔案名稱"></textarea>
+    <p>請在下面的 radio 元素中選擇測試的方式，然後在下面的 input 元素中輸入要測試的標籤、屬性和值，然後點擊「測試內容」按鈕</p> <input type="radio" id="DOM" name="radio"
+        value="DOM"> <label for="DOM">DOM</label> <input type="radio" id="JavaScript" name="radio" value="JavaScript">
+    <label for="JavaScript">JavaScript</label> <input type="radio" id="fetch" name="radio" value="fetch"> <label
+        for="fetch">fetch</label> <br> <input id="input1" type="text" placeholder="請輸入要測試的標籤"> <input id="input2"
+        type="text" placeholder="請輸入要測試的屬性"> <input id="input3" type="text" placeholder="請輸入要測試的值"> <button
+        onclick="testContent()">測試內容</button>
+</body>
+
+</html>

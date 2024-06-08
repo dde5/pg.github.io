@@ -1,0 +1,172 @@
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #FDF6E3;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 36px;
+            color: #268BD2;
+            margin: 20px 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .result {
+            position: sticky;
+            top: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #EEE8D5;
+            padding: 10px;
+            border: 2px solid #93A1A1;
+            border-radius: 10px;
+        }
+
+        .result textarea {
+            width: 70%;
+            height: 100px;
+            resize: none;
+            font-size: 16px;
+            color: #657B83;
+            border: none;
+            outline: none;
+            background-color: transparent;
+        }
+
+        .result button {
+            width: 15%;
+            height: 40px;
+            font-size: 16px;
+            color: #FDF6E3;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .result button:hover {
+            transform: scale(1.1);
+        }
+
+        .result button:active {
+            transform: scale(0.9);
+        }
+
+        .result .copy {
+            background-color: #859900;
+        }
+
+        .result .slide {
+            background-color: #CB4B16;
+        }
+
+        .slide-page {
+            position: fixed;
+            bottom: -100%;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background-color: #EEE8D5;
+            border-top: 2px solid #93A1A1;
+            border-radius: 10px 10px 0 0;
+            transition: 0.5s;
+        }
+
+        .slide-page.active {
+            bottom: 0;
+        }
+
+        .slide-page .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            font-size: 20px;
+            color: #FDF6E3;
+            background-color: #CB4B16;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .slide-page .close:hover {
+            transform: rotate(90deg);
+        }
+
+        .slide-page .close:active {
+            transform: rotate(-90deg);
+        }
+
+        .slide-page .content {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-around;
+            padding: 20px;
+        }
+
+        .slide-page .content a {
+            display: block;
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+            border: 2px solid #93A1A1;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .slide-page .content a img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .form {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            margin: 20px 0;
+        }
+
+        .form select, .form input {
+            width: 45%;
+            height: 40px;
+            font-size: 16px;
+            color: #657B83;
+            border: 2px solid #93A1A1;
+            border-radius: 10px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        .form select:focus, .form input:focus {
+            outline: none;
+            border-color: #268BD2;
+        }
+
+        @media screen and (max-width: 600px) {
+            .result textarea {
+                width: 60%;
+            }
+
+            .result button {
+                width: 20%;
+            }
+
+            .form select, .form input {
+                width: 90%;
+            }
+        }

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prompt Generator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background-color: #FDF6E3;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 36px;
+      color: #268BD2;
+      margin: 20px 0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .result {
+      position: sticky;
+      top: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #EEE8D5;
+      padding: 10px;
+      border: 2px solid #93A1A1;
+      border-radius: 10px;
+    }
+
+    .result textarea {
+      width: 70%;
+      height: 100px;
+      resize: none;
+      font-size: 16px;
+      color: #657B83;
+      border: none;
+      outline: none;
+      background-color: transparent;
+    }
+
+    .result button {
+      width: 15%;
+      height: 40px;
+      font-size: 16px;
+      color: #FDF6E3;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .result button:hover {
+      transform: scale(1.1);
+    }
+
+    .result button:active {
+      transform: scale(0.9);
+    }
+
+    .result .copy {
+      background-color: #859900;
+    }
+
+    .result .slide {
+      background-color: #CB4B16;
+    }
+
+    .slide-page {
+      position: fixed;
+      bottom: -100%;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      background-color: #EEE8D5;
+      border-top: 2px solid #93A1A1;
+      border-radius: 10px 10px 0 0;
+      transition: 0.5s;
+    }
+
+    .slide-page.active {
+      bottom: 0;
+    }
+
+    .slide-page .close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 30px;
+      height: 30px;
+      font-size: 20px;
+      color: #FDF6E3;
+      background-color: #CB4B16;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .slide-page .close:hover {
+      transform: rotate(90deg);
+    }
+
+    .slide-page .close:active {
+      transform: rotate(-90deg);
+    }
+
+    .slide-page .content {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-around;
+      padding: 20px;
+    }
+
+    .slide-page .content a {
+      display: block;
+      width: 100px;
+      height: 100px;
+      margin: 10px;
+      border: 2px solid #93A1A1;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .slide-page .content a img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .form {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      margin: 20px 0;
+    }
+
+    .form select,
+    .form input {
+      width: 45%;
+      height: 40px;
+      font-size: 16px;
+      color: #657B83;
+      border: 2px solid #93A1A1;
+      border-radius: 10px;
+      padding: 10px;
+      margin: 10px 0;
+    }
+
+    .form select:focus,
+    .form input:focus {
+      outline: none;
+      border-color: #268BD2;
+    }
+
+    @media screen and (max-width: 600px) {
+      .result textarea {
+        width: 60%;
+      }
+
+      .result button {
+        width: 20%;
+      }
+
+      .form select,
+      .form input {
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Prompt Generator</h1>
+  <div class="container">
+    <div class="result">
+      <textarea id="result" readonly></textarea>
+      <button class="copy">複製</button>
+      <button class="slide">滑出</button>
+    </div>
+    <div class="slide-page">
+      <button class="close">&times;</button>
+      <div class="content">
+        <a href="https://www.bing.com" target="_blank"><img
+            src="https://www.bing.com/th?id=OIP.6l8f7ZtYy9z6k9qXw1jJ0AHaHa&w=100&h=100&c=8&rs=1&qlt=90&dpr=2&pid=3.1&rm=2"
+            alt="Bing"></a>
+        <a href="https://www.google.com" target="_blank"><img
+            src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google"></a>
+        <a href="https://www.wikipedia.org" target="_blank"><img
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/Wikipedia-logo-v2.svg/1200px-Wikipedia-logo-v2.svg.png"
+            alt="Wikipedia"></a>
+        <a href="https://www.youtube.com" target="_blank"><img
+            src="https://www.youtube.com/yts/img/yt_1200-vflhSIVnY.png" alt="YouTube"></a>
+        <a href="https://www.facebook.com" target="_blank"><img
+            src="https://www.facebook.com/images/fb_icon_325x325.png" alt="Facebook"></a>
+        <a href="https://www.twitter.com" target="_blank"><img
+            src="https://abs.twimg.com/icons/apple-touch-icon-192x192.png" alt="Twitter"></a>
+        <a href="https://www.instagram.com" target="_blank"><img
+            src="https://www.instagram.com/static/images/ico/favicon-192.png/68d99ba29cc8.png" alt="Instagram"></a>
+        <a href="https://www.github.com" target="_blank"><img
+            src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub"></a>
+        <a href="https://www.openai.com" target="_blank"><img
+            src="https://openai.com/content/images/2019/12/openai-logo-black-1.svg" alt="OpenAI"></a>
+        <a href="https://www.microsoft.com" target="_blank"><img
+            src="https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RE1Mu3b?ver=5c31"
+            alt="Microsoft"></a>
+      </div>
+    </div>
+    <div class="form">
+      <select id="role-select">
+        <option value="">請選擇您的角色</option>
+        <option value="我是一名學生">我是一名學生</option>
+        <option value="我是一名老師">我是一名老師</option>
+        <option value="我是一名作家">我是一名作家</option>
+        <option value="我是一名程式設計師">我是一名程式設計師</option>
+        <option value="我是一名藝術家">我是一名藝術家</option>
+      </select>
+      <input id="role" readonly>
+      <select id="need-select">
+        <option value="">請選擇您的需求</option>
+        <option value="我需要一些靈感">我需要一些靈感</option>
+        <option value="我需要一些幫助">我需要一些幫助</option>
+        <option value="我需要一些建議">我需要一些建議</option>
+        <option value="我需要一些教學">我需要一些教學</option>
+        <option value="我需要一些娛樂">我需要一些娛樂</option>
+      </select>
+      <input id="need" readonly>
+      <select id="task-select">
+        <option value="">請選擇您的任務</option>
+        <option value="我想寫一首詩">我想寫一首詩</option>
+        <option value="我想寫一篇文章">我想寫一篇文章</option>
+        <option value="我想寫一段代碼">我想寫一段代碼</option>
+        <option value="我想畫一幅畫">我想畫一幅畫</option>
+        <option value="我想玩一個遊戲">我想玩一個遊戲</option>
+      </select>
+      <input id="task" readonly>
+      <select id="detail-select">
+        <option value="">請選擇您的細節</option>
+        <option value="我想寫一首關於愛情的詩">我想寫一首關於愛情的詩</option>
+        <option value="我想寫一篇關於科技的文章">我想寫一篇關於科技的文章</option>
+        <option value="我想寫一段關於網頁設計的代碼">我想寫一段關於網頁設計的代碼</option>
+        <option value="我想畫一幅關於自然的畫">我想畫一幅關於自然的畫</option>
+        <option value="我想玩一個關於冒險的遊戲">我想玩一個關於冒險的遊戲</option>
+      </select>
+      <input id="detail" readonly>
+      <select id="dont-select">
+        <option value="">請選擇您不想要的東西</option>
+        <option value="我不想要太難的東西">我不想要太難的東西</option>
+        <option value="我不想要太簡單的東西">我不想要太簡單的東西</option>
+        <option value="我不想要太長的東西">我不想要太長的東西</option>
+        <option value="我不想要太短的東西">我不想要太短的東西</option>
+        <option value="我不想要太無聊的東西">我不想要太無聊的東西</option>
+      </select>
+      <input id="dont" readonly>
+      <select id="format-select">
+        <option value="">請選擇您想要的格式</option>
+        <option value="我想要一個文本格式的東西">我想要一個文本格式的東西</option>
+        <option value="我想要一個圖像格式的東西">我想要一個圖像格式的東西</option>
+        <option value="我想要一個音頻格式的東西">我想要一個音頻格式的東西</option>
+        <option value="我想要一個視頻格式的東西">我想要一個視頻格式的東西</option>
+        <option value="我想要一個互動格式的東西">我想要一個互動格式的東西</option>
+      </select>
+      <input id="format" readonly>
+      <select id="example-select">
+        <option value="">請選擇您想要的範例</option>
+        <option value="我想要一個有韻律的詩">我想要一個有韻律的詩</option>
+        <option value="我想要一個有引用的文章">我想要一個有引用的文章</option>
+        <option value="我想要一個有註釋的代碼">我想要一個有註釋的代碼</option>
+        <option value="我想要一個有色彩的畫">我想要一個有色彩的畫</option>
+        <option value="我想要一個有規則的遊戲">我想要一個有規則的遊戲</option>
+      </select>
+      <input id="example" readonly>
+      <select id="country-select">
+        <option value="">請選擇您想要的國家</option>
+        <option value="我想要一個關於台灣的東西">我想要一個關於台灣的東西</option>
+        <option value="我想要一個關於中國的東西">我想要一個關於中國的東西</option>
+        <option value="我想要一個關於日本的東西">我想要一個關於日本的東西</option>
+        <option value="我想要一個關於美國的東西">我想要一個關於美國的東西</option>
+        <option value="我想要一個關於法國的東西">我想要一個關於法國的東西</option>
+      </select>
+      <input id="country" readonly>
+      <select id="reply-select">
+        <option value="">請選擇您想要的回覆</option>
+        <option value="我想要一個讚美的回覆">我想要一個讚美的回覆</option>
+        <option value="我想要一個批評的回覆">我想要一個批評的回覆</option>
+        <option value="我想要一個問題的回覆">我想要一個問題的回覆</option>
+        <option value="我想要一個建議的回覆">我想要一個建議的回覆</option>
+        <option value="我想要一個感謝的回覆">我想要一個感謝的回覆</option>
+      </select>
+      <input id="reply" readonly>
+      <select id="adds-select">
+        <option value="">請選擇您想要的附加內容</option>
+        <option value="我想要一個笑話">我想要一個笑話</option>
+        <option value="我想要一個故事">我想要一個故事</option>
+        <option value="我想要一個詩歌">我想要一個詩歌</option>
+        <option value="我想要一個圖片">我想要一個圖片</option>
+        <option value="我想要一個音樂">我想要一個音樂</option>
+      </select>
+      <input id="adds-input" readonly>
+    </div>
+    <script>
+      // 獲取所有的select和input元素
+      let selects = document.querySelectorAll(".form select");
+      let inputs = document.querySelectorAll(".form input");
+      // 獲取結果的textarea元素
+      let result = document.getElementById("result");
+      // 獲取複製按鈕
+      let copy = document.querySelector(".copy");
+      // 獲取滑出按鈕
+      let slide = document.querySelector(".slide");
+      // 獲取滑出頁面
+      let slidePage = document.querySelector(".slide-page");
+      // 獲取關閉按鈕
+      let close = document.querySelector(".close");
+      // 為每個select元素添加一個change事件監聽器
+      for (let i = 0; i < selects.length; i++) {
+        selects[i].addEventListener("change", function () {
+          // 將對應的input元素的值設為選擇的值
+          inputs[i].value = this.value;
+          // 更新結果的內容
+          updateResult();
+        });
+      }
+      // 定義一個函數來更新結果的內容
+      function updateResult() {
+        // 清空結果的內容
+        result.value = "";
+        // 遍歷每個input元素
+        for (let input of inputs) {
+          // 如果input元素有值，則將它添加到結果的內容中，並換行
+          if (input.value) {
+            result.value += input.value + "\n";
+          }
+        }
+      }
+      // 為複製按鈕添加一個click事件監聽器
+      copy.addEventListener("click", function () {
+        // 將結果的內容複製到剪貼板中
+        navigator.clipboard.writeText(result.value)
+          .then(() => {
+            // 如果成功，則彈出一個提示窗口
+            alert("已複製到剪貼板");
+          })
+          .catch((error) => {
+            // 如果失敗，則彈出一個錯誤窗口
+            alert("複製失敗，請重試");
+          });
+      });
+      // 為滑出按鈕添加一個click事件監聽器
+      slide.addEventListener("click", function () {
+        // 切換滑出頁面的active類別，從而改變它的bottom屬性
+        slidePage.classList.toggle("active");
+      });
+      // 為關閉按鈕添加一個click事件監聽器
+      close.addEventListener("click", function () {
+        // 切換滑出頁面的active類別，從而改變它的bottom屬性
+        slidePage.classList.toggle("active");
+      });
+
+      // 為每個input元素添加一個dblclick事件監聽器
+      for (let input of inputs) {
+        input.addEventListener("dblclick", function () {
+          // 移除input元素的readonly屬性，讓它可以編輯
+          input.removeAttribute("readonly");
+        });
+      }
+      // 為每個input元素添加一個blur事件監聽器
+      for (let input of inputs) {
+        input.addEventListener("blur", function () {
+          // 添加input元素的readonly屬性，讓它不可以編輯
+          input.setAttribute("readonly", "readonly");
+          // 將input元素的值設為編輯的文字
+          input.value = input.value;
+          // 更新結果的內容，將編輯的文字添加到結果的textarea中，並且刪除原本的下拉選單的值
+          updateResult();
+          result.value = result.value.split("\n").map(line => line.replace(/(請選擇.*)/, input.value)).join("\n");
+        });
+      }
+
+      // 為每個input元素添加一個keydown事件監聽器
+      for (let input of inputs) {
+        input.addEventListener("keydown", function (event) {
+          // 檢查是否是enter鍵，如果是，就觸發更新的函數
+          if (event.keyCode === 13) {
+            // 阻止默認的行為，例如換行
+            event.preventDefault();
+            // 添加input元素的readonly屬性，讓它不可以編輯
+            input.setAttribute("readonly", "readonly");
+            // 將input元素的值設為編輯的文字
+            input.value = input.value;
+            // 更新結果的內容，將編輯的文字添加到結果的textarea中，並且刪除原本的下拉選單的值
+            updateResult();
+            result.value = result.value.split("\n").map(line => line.replace(/(請選擇.*)/, input.value)).join("\n");
+          }
+        });
+      }
+
+    </script>
+  </div>
+</body>
+
+</html>

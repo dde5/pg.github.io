@@ -1,0 +1,14 @@
+{
+  "languages": [
+    { "code": "", "name": "Option 可不選" },
+    { "code": "The language of your reply answer will match the language of the user input.", "name": "Auto" },
+    { "code": "en", "name": "English" },
+    { "code": "#zh-TW", "name": "繁體中文" },
+    { "code": "#zh-CN", "name": "简体中文" },
+    { "code": "#ja", "name": "日本語" },
+    { "code": "#ko", "name": "한국어" },
+    { "code": "#fr", "name": "Français" },
+    { "code": "#de", "name": "Deutsch" }
+    // Add more language options as needed
+  ]
+}
