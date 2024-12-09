@@ -74,7 +74,6 @@
       const lines = subtitleContent.split('\n');
       return lines.map(line => {
         for (const [original, corrected] of Object.entries(fixes)) {
-          // 使用正則表達式全字匹配並進行替換
           const regex = new RegExp(`\\b${escapeRegExp(original)}\\b`, 'g');
           line = line.replace(regex, corrected);
         }
@@ -83,7 +82,6 @@
     }
 
     function escapeRegExp(string) {
-      // 轉義正則表達式中特殊字元
       return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 
