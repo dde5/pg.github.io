@@ -81,8 +81,12 @@
 
     // 解析修正檔內容
     function parseFixes(mdContent) {
+      if (!mdContent.trim()) {
+        throw new Error("修正檔為空，請確認內容是否正確！");
+      }
+
       const fixes = {};
-      const regex = /- 原始字幕內容：(.*?)\n- 建議修正內容：(.*?)\n/g;
+      const regex = /- 原始字幕內容：(.*?)\r?\n- 建議修正內容：(.*?)\r?\n/g;
       let match;
       while ((match = regex.exec(mdContent)) !== null) {
         const originals = match[1].split(',').map(s => s.trim());
@@ -138,14 +142,8 @@
         const fixContent = await readFile(fixFile);
         const fixes = parseFixes(fixContent);
 
-        // 確保修正檔被正確解析
-        if (Object.keys(fixes).length === 0) {
-          throw new Error('修正檔解析失敗，請檢查內容格式！');
-        }
-
         correctedContent = applyFixes(subtitleContent, fixes);
 
-        // 更新結果到界面
         outputElement.value = correctedContent;
         downloadButton.style.display = 'inline-block';
         alert('修正完成！');
