@@ -56,12 +56,9 @@
       let match;
       while ((match = regex.exec(mdContent)) !== null) {
         const originals = match[1].split(',').map(s => s.trim());
-        const corrections = match[2]
-          .replace(/\(.*?\)/g, '') // 去除括號及其內容
-          .split(',')
-          .map(s => s.trim());
+        const corrections = match[2].split(',').map(s => s.trim());
         if (originals.length !== corrections.length) {
-          throw new Error('原始字幕與修正字幕數量不匹配');
+          throw new Error("原始字幕與修正字幕數量不匹配，請檢查修正檔內容！");
         }
         originals.forEach((original, idx) => {
           fixes[original] = corrections[idx];
@@ -72,17 +69,22 @@
 
     function applyFixes(subtitleContent, fixes) {
       const lines = subtitleContent.split('\n');
-      return lines.map(line => {
-        for (const [original, corrected] of Object.entries(fixes)) {
-          const regex = new RegExp(`\\b${escapeRegExp(original)}\\b`, 'g');
-          line = line.replace(regex, corrected);
-        }
-        return line;
-      }).join('\n');
-    }
+      const updatedLines = [];
+      let modifiedCount = 0;
 
-    function escapeRegExp(string) {
-      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      lines.forEach(line => {
+        let originalLine = line;
+        for (const [original, corrected] of Object.entries(fixes)) {
+          if (originalLine.includes(original)) {
+            originalLine = originalLine.replaceAll(original, corrected);
+            modifiedCount++;
+          }
+        }
+        updatedLines.push(originalLine);
+      });
+
+      console.log(`總共修正了 ${modifiedCount} 處字幕錯誤。`);
+      return updatedLines.join('\n');
     }
 
     async function processFiles() {
@@ -92,7 +94,7 @@
       const downloadButton = document.getElementById('downloadButton');
 
       if (!subtitleFile || !fixFile) {
-        alert('請上傳字幕檔和修正檔');
+        alert("請上傳字幕檔和修正檔");
         return;
       }
 
@@ -104,9 +106,9 @@
 
         outputElement.value = correctedContent;
         downloadButton.style.display = 'inline-block';
-        alert('修正完成！');
+        alert("修正完成！");
       } catch (error) {
-        alert('發生錯誤：' + error.message);
+        alert("發生錯誤：" + error.message);
       }
     }
 
