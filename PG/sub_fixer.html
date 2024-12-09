@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>字幕修正工具</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      text-align: center;
+    }
+    input[type="file"] {
+      margin: 10px 0;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      margin-top: 10px;
+    }
+    .btn {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>字幕修正工具</h1>
+    <p>上傳字幕檔 (.srt 或 .txt) 和修正檔 (.md 或 .txt)</p>
+    <input type="file" id="subtitleFile" accept=".srt,.txt">
+    <input type="file" id="fixFile" accept=".md,.txt">
+    <button class="btn" onclick="processFiles()">修正字幕</button>
+    <textarea id="output" placeholder="修正後的字幕將顯示在這裡..." readonly></textarea>
+    <br>
+    <button class="btn" id="downloadButton" style="display:none;" onclick="downloadFile()">下載修正後字幕</button>
+  </div>
+  <script>
+    let correctedContent = '';
+
+    function readFile(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsText(file, 'utf-8');
+      });
+    }
+
+    function parseFixes(mdContent) {
+      const fixes = {};
+      const regex = /- 原始字幕內容：(.*?)\n- 建議修正內容：(.*?)\n/g;
+      let match;
+      while ((match = regex.exec(mdContent)) !== null) {
+        const originals = match[1].split(',').map(s => s.trim());
+        const corrections = match[2]
+          .replace(/\(.*?\)/g, '') // 去除括號及其內容
+          .split(',')
+          .map(s => s.trim());
+        if (originals.length !== corrections.length) {
+          throw new Error('原始字幕與修正字幕數量不匹配');
+        }
+        originals.forEach((original, idx) => {
+          fixes[original] = corrections[idx];
+        });
+      }
+      return fixes;
+    }
+
+    function applyFixes(subtitleContent, fixes) {
+      const lines = subtitleContent.split('\n');
+      return lines.map(line => {
+        for (const [original, corrected] of Object.entries(fixes)) {
+          // 使用正則表達式全字匹配並進行替換
+          const regex = new RegExp(`\\b${escapeRegExp(original)}\\b`, 'g');
+          line = line.replace(regex, corrected);
+        }
+        return line;
+      }).join('\n');
+    }
+
+    function escapeRegExp(string) {
+      // 轉義正則表達式中特殊字元
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    async function processFiles() {
+      const subtitleFile = document.getElementById('subtitleFile').files[0];
+      const fixFile = document.getElementById('fixFile').files[0];
+      const outputElement = document.getElementById('output');
+      const downloadButton = document.getElementById('downloadButton');
+
+      if (!subtitleFile || !fixFile) {
+        alert('請上傳字幕檔和修正檔');
+        return;
+      }
+
+      try {
+        const subtitleContent = await readFile(subtitleFile);
+        const fixContent = await readFile(fixFile);
+        const fixes = parseFixes(fixContent);
+        correctedContent = applyFixes(subtitleContent, fixes);
+
+        outputElement.value = correctedContent;
+        downloadButton.style.display = 'inline-block';
+        alert('修正完成！');
+      } catch (error) {
+        alert('發生錯誤：' + error.message);
+      }
+    }
+
+    function downloadFile() {
+      const blob = new Blob([correctedContent], { type: 'text/plain' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'corrected_subtitles.srt';
+      link.click();
+    }
+  </script>
+</body>
+</html>
