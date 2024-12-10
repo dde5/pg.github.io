@@ -77,7 +77,7 @@
     <input type="file" id="fixFile" accept=".md,.txt" style="display: none;" onchange="readFixFile()">
     <textarea id="fixTextarea" placeholder="或直接在此貼上修正檔內容"></textarea>
 
-    <button onclick="processFiles()">修正字幕</button><label>
+    <button onclick="processFiles()">修正字幕</button>    <label>
       <input type="checkbox" id="removeBrackets"> 是否去除修正檔括號內容
     </label>
     <textarea id="output" placeholder="修正後的字幕將顯示在這裡..." readonly></textarea>
@@ -129,9 +129,16 @@
       while ((match = regex.exec(mdContent)) !== null) {
         const originals = match[1].split(',').map(s => s.trim());
         let corrections = match[2].split(',').map(s => s.trim());
+
+        // 去除括號內容（若核取方塊被勾選）
         if (removeBrackets) {
-          corrections = corrections.map(correction => correction.replace(/\(.*?\)/g, '').trim());
+          corrections = corrections.map((correction, idx) => {
+            const cleanCorrection = correction.replace(/\(.*?\)/g, '').trim();
+            // 如果清理後內容為空，則使用原始字幕內容作為修正內容
+            return cleanCorrection || originals[idx];
+          });
         }
+
         if (originals.length !== corrections.length) {
           throw new Error('原始字幕與修正字幕數量不匹配，請檢查修正檔內容！');
         }
