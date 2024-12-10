@@ -42,41 +42,69 @@
     }
     textarea {
       width: 100%;
-      height: 200px;
-      margin-top: 20px;
+      margin-top: 10px;
+      margin-bottom: 20px;
       padding: 10px;
       font-size: 14px;
       border: 1px solid #ccc;
       border-radius: 4px;
-      resize: none;
+      resize: both; /* 可調整大小 */
+    }
+    .info {
+      margin-top: 10px;
+      color: #007BFF;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>字幕修正工具</h1>
-    <p>請上傳字幕檔 (.srt 或 .txt) 和修正檔 (.md 或 .txt)</p>
-    <input type="file" id="subtitleFile" accept=".srt,.txt">
-    <input type="file" id="fixFile" accept=".md,.txt">
+    <p>請上傳字幕檔或直接貼上內容</p>
+    <button onclick="document.getElementById('subtitleFile').click()">選擇字幕檔案</button>
+    <input type="file" id="subtitleFile" accept=".srt,.txt" style="display: none;" onchange="readSubtitleFile()">
+    <textarea id="subtitleTextarea" placeholder="或直接在此貼上字幕內容" style="height: 110px;"></textarea>
+
+    <p>請上傳修正檔或直接貼上內容</p>
+    <button onclick="document.getElementById('fixFile').click()">選擇修正檔案</button>
+    <input type="file" id="fixFile" accept=".md,.txt" style="display: none;" onchange="readFixFile()">
+    <textarea id="fixTextarea" placeholder="或直接在此貼上修正檔內容" style="height: 110px;"></textarea>
+
     <button onclick="processFiles()">修正字幕</button>
-    <textarea id="output" placeholder="修正後的字幕將顯示在這裡..." readonly></textarea>
+    <textarea id="output" placeholder="修正後的字幕將顯示在這裡..." style="height: 110px;" readonly></textarea>
+    <div class="info" id="info"></div>
     <button id="downloadButton" style="display:none;" onclick="downloadFile()">下載修正後字幕</button>
   </div>
 
   <script>
     let correctedContent = '';
 
-    // 讀取檔案內容
-    function readFile(file) {
-      return new Promise((resolve, reject) => {
+    // 讀取字幕檔內容
+    function readSubtitleFile() {
+      const subtitleFile = document.getElementById('subtitleFile').files[0];
+      if (subtitleFile) {
         const reader = new FileReader();
         reader.onload = () => {
-          console.log(`讀取的檔案內容：\n${reader.result}`);
-          resolve(reader.result);
+          document.getElementById('subtitleTextarea').value = reader.result;
+          console.log("讀取的字幕檔內容：\n", reader.result);
         };
-        reader.onerror = () => reject(reader.error);
-        reader.readAsText(file, 'utf-8');
-      });
+        reader.onerror = () => alert("無法讀取字幕檔！");
+        reader.readAsText(subtitleFile, 'utf-8');
+      }
+    }
+
+    // 讀取修正檔內容
+    function readFixFile() {
+      const fixFile = document.getElementById('fixFile').files[0];
+      if (fixFile) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          document.getElementById('fixTextarea').value = reader.result;
+          console.log("讀取的修正檔內容：\n", reader.result);
+        };
+        reader.onerror = () => alert("無法讀取修正檔！");
+        reader.readAsText(fixFile, 'utf-8');
+      }
     }
 
     // 解析修正檔內容
@@ -123,27 +151,26 @@
       });
 
       console.log(`總共修正了 ${modifiedCount} 處字幕錯誤。`);
+      document.getElementById('info').textContent = `總共修正了 ${modifiedCount} 處字幕錯誤。`;
       return updatedLines.join('\n');
     }
 
     async function processFiles() {
-      const subtitleFile = document.getElementById('subtitleFile').files[0];
-      const fixFile = document.getElementById('fixFile').files[0];
+      const subtitleContent = document.getElementById('subtitleTextarea').value.trim();
+      const fixContent = document.getElementById('fixTextarea').value.trim();
       const outputElement = document.getElementById('output');
       const downloadButton = document.getElementById('downloadButton');
 
-      if (!subtitleFile || !fixFile) {
-        alert('請上傳字幕檔和修正檔！');
+      if (!subtitleContent || !fixContent) {
+        alert('請提供字幕檔和修正檔的內容！');
         return;
       }
 
       try {
-        const subtitleContent = await readFile(subtitleFile);
-        const fixContent = await readFile(fixFile);
         const fixes = parseFixes(fixContent);
-
         correctedContent = applyFixes(subtitleContent, fixes);
 
+        // 更新結果到界面
         outputElement.value = correctedContent;
         downloadButton.style.display = 'inline-block';
         alert('修正完成！');
