@@ -28,6 +28,9 @@
       margin: 10px 0;
       padding: 5px;
     }
+    input[type="checkbox"] {
+      margin-right: 5px;
+    }
     button {
       background-color: #007BFF;
       color: #fff;
@@ -48,12 +51,16 @@
       font-size: 14px;
       border: 1px solid #ccc;
       border-radius: 4px;
-      resize: both; /* 可調整大小 */
+      resize: both;
     }
     .info {
       margin-top: 10px;
+      font-size: 14px;
+      color: #333;
+      white-space: pre-line; /* 保持換行格式 */
+    }
+    .info strong {
       color: #007BFF;
-      font-weight: bold;
     }
   </style>
 </head>
@@ -63,21 +70,24 @@
     <p>請上傳字幕檔或直接貼上內容</p>
     <button onclick="document.getElementById('subtitleFile').click()">選擇字幕檔案</button>
     <input type="file" id="subtitleFile" accept=".srt,.txt" style="display: none;" onchange="readSubtitleFile()">
-    <textarea id="subtitleTextarea" placeholder="或直接在此貼上字幕內容" style="height: 110px;"></textarea>
+    <textarea id="subtitleTextarea" placeholder="或直接在此貼上字幕內容"></textarea>
 
     <p>請上傳修正檔或直接貼上內容</p>
     <button onclick="document.getElementById('fixFile').click()">選擇修正檔案</button>
     <input type="file" id="fixFile" accept=".md,.txt" style="display: none;" onchange="readFixFile()">
-    <textarea id="fixTextarea" placeholder="或直接在此貼上修正檔內容" style="height: 110px;"></textarea>
+    <textarea id="fixTextarea" placeholder="或直接在此貼上修正檔內容"></textarea>
 
-    <button onclick="processFiles()">修正字幕</button>
-    <textarea id="output" placeholder="修正後的字幕將顯示在這裡..." style="height: 110px;" readonly></textarea>
-    <div class="info" id="info"></div>
+    <button onclick="processFiles()">修正字幕</button><label>
+      <input type="checkbox" id="removeBrackets"> 是否去除修正檔括號內容
+    </label>
+    <textarea id="output" placeholder="修正後的字幕將顯示在這裡..." readonly></textarea>
     <button id="downloadButton" style="display:none;" onclick="downloadFile()">下載修正後字幕</button>
+    <div class="info" id="info"></div>
   </div>
 
   <script>
     let correctedContent = '';
+    let modificationDetails = ''; // 存放修正詳細內容
 
     // 讀取字幕檔內容
     function readSubtitleFile() {
@@ -108,7 +118,7 @@
     }
 
     // 解析修正檔內容
-    function parseFixes(mdContent) {
+    function parseFixes(mdContent, removeBrackets) {
       if (!mdContent.trim()) {
         throw new Error("修正檔為空，請確認內容是否正確！");
       }
@@ -118,10 +128,10 @@
       let match;
       while ((match = regex.exec(mdContent)) !== null) {
         const originals = match[1].split(',').map(s => s.trim());
-        const corrections = match[2]
-          .replace(/\(.*?\)/g, '') // 去除括號
-          .split(',')
-          .map(s => s.trim());
+        let corrections = match[2].split(',').map(s => s.trim());
+        if (removeBrackets) {
+          corrections = corrections.map(correction => correction.replace(/\(.*?\)/g, '').trim());
+        }
         if (originals.length !== corrections.length) {
           throw new Error('原始字幕與修正字幕數量不匹配，請檢查修正檔內容！');
         }
@@ -138,26 +148,37 @@
       const lines = subtitleContent.split('\n');
       const updatedLines = [];
       let modifiedCount = 0;
+      modificationDetails = ''; // 清空修正詳細資訊
 
       lines.forEach(line => {
         let updatedLine = line;
+        let modified = false;
+
         for (const [original, corrected] of Object.entries(fixes)) {
           if (updatedLine.includes(original)) {
+            modified = true;
             updatedLine = updatedLine.replaceAll(original, corrected);
-            modifiedCount++;
           }
+        }
+
+        if (modified) {
+          modificationDetails += `修正字幕行：${line} -> ${updatedLine}\n`;
+          modifiedCount++;
         }
         updatedLines.push(updatedLine);
       });
 
-      console.log(`總共修正了 ${modifiedCount} 處字幕錯誤。`);
-      document.getElementById('info').textContent = `總共修正了 ${modifiedCount} 處字幕錯誤。`;
+      modificationDetails = `總共修正了 ${modifiedCount} 處字幕錯誤。\n\n` + modificationDetails;
+      console.log(modificationDetails);
+
+      document.getElementById('info').textContent = modificationDetails;
       return updatedLines.join('\n');
     }
 
     async function processFiles() {
       const subtitleContent = document.getElementById('subtitleTextarea').value.trim();
       const fixContent = document.getElementById('fixTextarea').value.trim();
+      const removeBrackets = document.getElementById('removeBrackets').checked;
       const outputElement = document.getElementById('output');
       const downloadButton = document.getElementById('downloadButton');
 
@@ -167,7 +188,7 @@
       }
 
       try {
-        const fixes = parseFixes(fixContent);
+        const fixes = parseFixes(fixContent, removeBrackets);
         correctedContent = applyFixes(subtitleContent, fixes);
 
         // 更新結果到界面
