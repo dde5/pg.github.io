@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LineCode編輯器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 10px;
+        }
+        #textInput {
+            width: 90%;
+            height: 100px;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            justify-content: center;
+            width: 90%;
+        }
+        button {
+            padding: 10px;
+            font-size: 14px;
+        }
+        #resultDisplay {
+            width: 90%;
+            min-height: 50px;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+            padding: 10px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .colored {
+            color: red;
+        }
+        .bold {
+            font-weight: bold;
+        }
+        .italic {
+            font-style: italic;
+        }
+        .strike {
+            text-decoration: line-through;
+        }
+        .outline {
+            border: 1px solid black;
+            padding: 2px;
+        }
+		img {
+		  width: 50px; /* 調整為你需要的大小 */
+		  height: auto;
+		}
+
+    </style>
+</head>
+<body>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/LINE_logo.svg/180px-LINE_logo.svg.png"><h2>LineCode編輯器</h2></img>
+    <textarea id="textInput" placeholder="在這裡輸入訊息"></textarea>
+    
+    <div class="button-container">
+        <button onclick="applyEffect('bold')">粗體</button>
+        <button onclick="applyEffect('italic')">斜體</button>
+        <button onclick="applyEffect('strike')">刪除線</button>
+        <button onclick="applyEffect('color')">變色</button>
+        <button onclick="applyEffect('boldstrike')">刪除加粗體</button>
+        <button onclick="applyEffect('italicstrike')">刪除加斜體</button>
+        <button onclick="applyEffect('italiccolor')">斜體加紅字</button>
+        <button onclick="applyEffect('boldcolor')">粗體加紅字</button>
+        <button onclick="applyEffect('outline')">加外框</button>
+        <button onclick="copyText()">一鍵複製</button>
+    </div>
+
+    <div id="resultDisplay"></div>
+
+    <script>
+        // 定義每個特效的函數
+        function applyEffect(effect) {
+            const textArea = document.getElementById('textInput');
+            const selection = textArea.value.slice(textArea.selectionStart, textArea.selectionEnd);
+            let newText = '';
+            
+            switch(effect) {
+                case 'bold':
+                    newText = `**${selection}**`;
+                    break;
+                case 'italic':
+                    newText = `*${selection}*`;
+                    break;
+                case 'strike':
+                    newText = `~~${selection}~~`;
+                    break;
+                case 'color':
+                    newText = `‵${selection}‵`;
+                    break;
+                case 'boldstrike':
+                    newText = `**~~${selection}~~**`;
+                    break;
+                case 'italicstrike':
+                    newText = `*~~${selection}~~*`;
+                    break;
+                case 'italiccolor':
+                    newText = `*‵${selection}‵*`;
+                    break;
+                case 'boldcolor':
+                    newText = `**‵${selection}‵**`;
+                    break;
+                case 'outline':
+                    newText = `~~~${selection}`;
+                    break;
+            }
+
+            // 插入新文本
+            const start = textArea.selectionStart;
+            const end = textArea.selectionEnd;
+            textArea.value = textArea.value.slice(0, start) + newText + textArea.value.slice(end);
+            textArea.focus();
+            textArea.setSelectionRange(start + newText.length, start + newText.length);
+
+            updateDisplay();
+        }
+
+        // 更新顯示區
+        function updateDisplay() {
+            const textArea = document.getElementById('textInput');
+            const display = document.getElementById('resultDisplay');
+            let content = textArea.value;
+
+            // 這裡應用簡單的正則表達式來格式化文本
+            content = content.replace(/\*\*([^*]+)\*\*/g, '<span class="bold">$1</span>');
+            content = content.replace(/\*([^*]+)\*/g, '<span class="italic">$1</span>');
+            content = content.replace(/~~([^~]+)~~/g, '<span class="strike">$1</span>');
+            content = content.replace(/‵([^‵]+)‵/g, '<span class="colored">$1</span>');
+            content = content.replace(/~~~([^~]+)/g, '<span class="outline">$1</span>');
+
+            display.innerHTML = content;
+        }
+
+        // 一鍵複製功能
+        function copyText() {
+            const textArea = document.getElementById('textInput');
+            textArea.select();
+            document.execCommand('copy');
+            alert('已複製到剪貼板！');
+        }
+
+        // 監聽輸入事件來更新顯示
+        document.getElementById('textInput').addEventListener('input', updateDisplay);
+    </script>
+</body>
+</html>
